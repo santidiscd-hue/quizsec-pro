@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizSec PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090e;--surface:#0d1117;--card:#161b22;--card2:#1c2128;
+  --border:#21262d;--border2:#30363d;
+  --accent:#58a6ff;--accent2:#f78166;--green:#3fb950;
+  --yellow:#e3b341;--purple:#bc8cff;--pink:#f778ba;
+  --text:#e6edf3;--muted:#8b949e;--muted2:#6e7681;
+  --gold:#ffd700;--silver:#b0b8c1;--bronze:#c77b3a;
+  --ff-display:'Bebas Neue',sans-serif;
+  --ff-body:'DM Sans',sans-serif;
+  --ff-mono:'JetBrains Mono',monospace;
+  --r:12px;--r-lg:18px;--r-xl:24px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--ff-body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(88,166,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(88,166,255,.025) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;z-index:0;}
+.page{position:relative;z-index:1;}
+
+/* ─── HEADER ─── */
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--border);background:rgba(13,17,23,.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:300;gap:12px;flex-wrap:wrap;}
+.logo{font-family:var(--ff-display);font-size:1.55rem;letter-spacing:3px;color:var(--text);line-height:1;flex-shrink:0;}
+.logo em{color:var(--accent);font-style:normal;}
+.logo sup{font-family:var(--ff-body);font-size:.55rem;font-weight:700;color:var(--green);letter-spacing:1px;vertical-align:super;}
+.hdr-center{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.live-chip{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:700;color:var(--green);font-family:var(--ff-mono);background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.25);padding:4px 10px;border-radius:50px;}
+.live-chip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.4s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+#hdr-clock{font-family:var(--ff-mono);font-size:.72rem;color:var(--muted);white-space:nowrap;}
+.nav-btns{display:flex;gap:6px;flex-shrink:0;}
+
+/* ─── BUTTONS ─── */
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:var(--ff-body);font-size:.82rem;font-weight:700;transition:all .15s;letter-spacing:.02em;white-space:nowrap;}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-accent{background:var(--accent);color:#000;}
+.btn-accent:hover{background:#79baff;transform:translateY(-1px);}
+.btn-green{background:var(--green);color:#000;}
+.btn-green:hover{background:#5cd669;transform:translateY(-1px);}
+.btn-danger{background:rgba(247,129,102,.12);border:1px solid rgba(247,129,102,.4);color:var(--accent2);}
+.btn-danger:hover{background:rgba(247,129,102,.22);}
+.btn-yellow{background:rgba(227,179,65,.12);border:1px solid rgba(227,179,65,.35);color:var(--yellow);}
+.btn-yellow:hover{background:rgba(227,179,65,.22);}
+.btn-purple{background:rgba(188,140,255,.12);border:1px solid rgba(188,140,255,.35);color:var(--purple);}
+.btn-purple:hover{background:rgba(188,140,255,.22);}
+.btn-lg{padding:13px 26px;font-size:.92rem;border-radius:10px;}
+.btn-full{width:100%;}
+.btn-sm{padding:5px 12px;font-size:.75rem;border-radius:6px;}
+
+/* ─── SCREENS ─── */
+.screen{display:none;min-height:calc(100vh - 61px);padding:32px 18px;}
+.screen.active{display:flex;flex-direction:column;align-items:center;}
+
+/* ─── WELCOME ─── */
+.hero{text-align:center;max-width:620px;margin:0 auto 32px;animation:fadeUp .55s ease both;}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-family:var(--ff-mono);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.18);padding:5px 14px;border-radius:50px;margin-bottom:16px;}
+.hero h1{font-family:var(--ff-display);font-size:4.2rem;line-height:.93;letter-spacing:1px;margin-bottom:12px;}
+.hero h1 em{color:var(--accent);font-style:normal;}
+.hero p{color:var(--muted);font-size:.97rem;line-height:1.65;margin-bottom:24px;}
+.cycle-badge{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border2);border-radius:50px;padding:8px 18px;font-size:.82rem;font-weight:700;margin-bottom:24px;}
+.cycle-badge .cb-num{font-family:var(--ff-mono);color:var(--yellow);font-size:1rem;}
+
+/* schedule */
+.schedule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;width:100%;max-width:540px;margin-bottom:28px;}
+.s-chip{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 12px;text-align:center;transition:all .2s;}
+.s-chip.open{border-color:var(--green);box-shadow:0 0 0 1px rgba(63,185,80,.2);}
+.s-chip.done{opacity:.5;}
+.s-chip .sc-num{font-family:var(--ff-mono);font-size:.65rem;color:var(--muted);margin-bottom:4px;}
+.s-chip .sc-day{font-weight:700;font-size:.88rem;margin-bottom:3px;}
+.s-chip .sc-date{font-size:.7rem;color:var(--muted);margin-bottom:6px;}
+.s-chip .sc-pill{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:50px;}
+.pill-open{background:rgba(63,185,80,.18);color:var(--green);}
+.pill-done{background:rgba(139,148,158,.1);color:var(--muted);}
+.pill-next{background:rgba(88,166,255,.12);color:var(--accent);}
+.pill-pending{background:rgba(33,38,45,.8);color:var(--muted2);}
+
+/* form card */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;width:100%;max-width:420px;animation:fadeUp .6s ease both .1s both;}
+.fl{display:block;font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;}
+.fi{width:100%;padding:11px 15px;border-radius:9px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-family:var(--ff-body);font-size:.93rem;outline:none;transition:border-color .2s;margin-bottom:16px;}
+.fi:focus{border-color:var(--accent);}
+.fi-sm{padding:8px 12px;font-size:.85rem;}
+.notice{border-radius:9px;padding:11px 15px;font-size:.83rem;font-weight:600;margin-bottom:14px;}
+.notice-green{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.22);color:var(--green);}
+.notice-yellow{background:rgba(227,179,65,.08);border:1px solid rgba(227,179,65,.22);color:var(--yellow);}
+.notice-red{background:rgba(247,129,102,.08);border:1px solid rgba(247,129,102,.22);color:var(--accent2);}
+.notice-blue{background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.22);color:var(--accent);}
+
+/* live time */
+.time-row{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-family:var(--ff-mono);flex-wrap:wrap;gap:6px;}
+.tb{display:flex;flex-direction:column;align-items:center;}
+.tv{font-size:1.2rem;font-weight:700;color:var(--accent);}
+.tl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;}
+.ts{color:var(--border2);font-size:1.1rem;}
+
+/* locked */
+.locked-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:44px 32px;text-align:center;max-width:500px;width:100%;animation:fadeUp .5s ease both;}
+.li{font-size:3rem;margin-bottom:14px;display:block;}
+.locked-card h2{font-family:var(--ff-display);font-size:2.2rem;letter-spacing:1px;margin-bottom:10px;}
+.locked-card p{color:var(--muted);line-height:1.65;margin-bottom:20px;}
+.cd-box{background:rgba(227,179,65,.07);border:1px solid rgba(227,179,65,.2);border-radius:10px;padding:14px;margin-bottom:20px;text-align:center;}
+.cd-lbl{font-size:.68rem;color:var(--yellow);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:5px;}
+.cd-val{font-family:var(--ff-mono);font-size:1.5rem;font-weight:700;}
+.next-box{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.18);border-radius:10px;padding:12px 18px;margin-bottom:20px;font-family:var(--ff-mono);font-size:.82rem;color:var(--accent);}
+
+/* ─── QUIZ ─── */
+.quiz-wrap{width:100%;max-width:650px;}
+.qtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
+.player-chip{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:50px;padding:6px 14px;font-size:.83rem;font-weight:700;}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;flex-shrink:0;}
+.score-chip{font-family:var(--ff-mono);font-size:.83rem;font-weight:700;color:var(--accent);background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);padding:6px 14px;border-radius:50px;}
+.sess-chip{font-size:.7rem;color:var(--muted);font-family:var(--ff-mono);background:var(--surface);border:1px solid var(--border);padding:4px 10px;border-radius:50px;}
+.prog-wrap{height:4px;background:var(--border);border-radius:99px;margin-bottom:8px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:99px;transition:width .4s ease;}
+.qcount{font-size:.7rem;color:var(--muted);font-family:var(--ff-mono);text-align:right;margin-bottom:18px;}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:30px;animation:fadeUp .38s ease both;}
+.q-badge{display:inline-block;font-size:.68rem;font-weight:700;font-family:var(--ff-mono);color:var(--accent);background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);padding:3px 10px;border-radius:50px;margin-bottom:12px;}
+.q-text{font-size:1.08rem;font-weight:500;line-height:1.55;margin-bottom:22px;}
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt{display:flex;align-items:center;gap:11px;padding:12px 16px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-family:var(--ff-body);font-size:.9rem;color:var(--text);text-align:left;transition:all .15s;}
+.opt-l{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--ff-mono);font-size:.68rem;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .15s;}
+.opt:hover:not(.disabled){border-color:var(--accent);background:rgba(88,166,255,.06);}
+.opt:hover:not(.disabled) .opt-l{border-color:var(--accent);color:var(--accent);}
+.opt.correct{border-color:var(--green);background:rgba(63,185,80,.1);}
+.opt.correct .opt-l{border-color:var(--green);color:var(--green);}
+.opt.wrong{border-color:var(--accent2);background:rgba(247,129,102,.1);}
+.opt.wrong .opt-l{border-color:var(--accent2);color:var(--accent2);}
+.opt.disabled{cursor:default;}
+.fb{margin-top:13px;padding:10px 16px;border-radius:9px;font-size:.85rem;font-weight:700;display:none;animation:fadeUp .3s ease;}
+.fb.show{display:block;}
+.fb.ok{background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.28);color:var(--green);}
+.fb.fail{background:rgba(247,129,102,.1);border:1px solid rgba(247,129,102,.28);color:var(--accent2);}
+.q-footer{margin-top:16px;display:flex;justify-content:flex-end;}
+
+/* ─── RESULT ─── */
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:44px 32px;text-align:center;max-width:480px;width:100%;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275) both;}
+.r-icon{font-size:3.2rem;margin-bottom:12px;display:block;}
+.result-card h2{font-family:var(--ff-display);font-size:2.3rem;letter-spacing:1px;margin-bottom:8px;}
+.result-card p{color:var(--muted);margin-bottom:18px;line-height:1.55;font-size:.9rem;}
+.r-big{font-family:var(--ff-mono);font-size:3.8rem;font-weight:700;color:var(--accent);line-height:1;}
+.r-sub{font-size:.75rem;color:var(--muted);margin-bottom:12px;}
+.cum-box{background:rgba(88,166,255,.07);border:1px solid rgba(88,166,255,.18);border-radius:10px;padding:14px;margin-bottom:22px;}
+.cum-val{font-family:var(--ff-mono);font-size:1.8rem;color:var(--accent);font-weight:700;}
+.cum-lbl{font-size:.7rem;color:var(--muted);}
+.r-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* ─── RANKING ─── */
+.rank-wrap{width:100%;max-width:720px;}
+.sec-title{font-family:var(--ff-display);font-size:2rem;letter-spacing:1px;margin-bottom:3px;}
+.sec-sub{color:var(--muted);font-size:.85rem;margin-bottom:22px;}
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px;}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.sum-val{font-family:var(--ff-mono);font-size:1.7rem;font-weight:700;color:var(--accent);}
+.sum-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin-bottom:28px;flex-wrap:wrap;}
+.p-place{display:flex;flex-direction:column;align-items:center;}
+.p-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#000;margin-bottom:8px;border:3px solid transparent;}
+.p-name{font-size:.78rem;font-weight:700;margin-bottom:3px;text-align:center;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.p-pts{font-family:var(--ff-mono);font-size:.82rem;margin-bottom:7px;font-weight:700;}
+.p-blk{border-radius:9px 9px 0 0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-mono);font-size:1.3rem;font-weight:700;width:86px;}
+.pp1 .p-av{background:linear-gradient(135deg,#ffd700,#ffb300);border-color:var(--gold);}
+.pp1 .p-blk{height:98px;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.28);color:var(--gold);}
+.pp1 .p-pts{color:var(--gold);}
+.pp2 .p-av{background:linear-gradient(135deg,#b0b8c1,#8a9099);border-color:var(--silver);}
+.pp2 .p-blk{height:70px;background:rgba(176,184,193,.07);border:1px solid rgba(176,184,193,.28);color:var(--silver);}
+.pp2 .p-pts{color:var(--silver);}
+.pp3 .p-av{background:linear-gradient(135deg,#c77b3a,#a06030);border-color:var(--bronze);}
+.pp3 .p-blk{height:50px;background:rgba(199,123,58,.07);border:1px solid rgba(199,123,58,.28);color:var(--bronze);}
+.pp3 .p-pts{color:var(--bronze);}
+.rank-list{display:flex;flex-direction:column;gap:6px;}
+.rank-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;transition:border-color .18s;animation:fadeUp .33s ease both;}
+.rank-row:hover{border-color:var(--border2);}
+.rank-row.is-me{border-color:var(--accent);background:rgba(88,166,255,.04);}
+.rn{font-family:var(--ff-mono);font-size:.78rem;color:var(--muted);width:20px;text-align:center;flex-shrink:0;}
+.ri{flex:1;min-width:0;}
+.ri-name{font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ri-meta{font-size:.7rem;color:var(--muted);font-family:var(--ff-mono);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.s-dots{display:inline-flex;gap:3px;align-items:center;}
+.s-dot{width:8px;height:8px;border-radius:50%;}
+.sd-ok{background:var(--green);}
+.sd-partial{background:var(--yellow);}
+.sd-none{background:var(--border2);}
+.rbadge{font-size:.63rem;padding:2px 8px;border-radius:50px;font-weight:700;flex-shrink:0;}
+.rb-s{background:rgba(63,185,80,.14);color:var(--green);}
+.rb-a{background:rgba(88,166,255,.14);color:var(--accent);}
+.rb-b{background:rgba(188,140,255,.14);color:var(--purple);}
+.rb-c{background:rgba(139,148,158,.1);color:var(--muted);}
+.rpts{font-family:var(--ff-mono);font-size:.98rem;font-weight:700;color:var(--accent);flex-shrink:0;}
+.empty-state{text-align:center;padding:44px;color:var(--muted);}
+.empty-state .ei{font-size:2.3rem;margin-bottom:10px;}
+.refresh-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.refresh-info{font-size:.7rem;color:var(--muted);font-family:var(--ff-mono);}
+
+/* ─── WINNERS HALL ─── */
+.hall-wrap{width:100%;max-width:680px;}
+.winner-card{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;animation:fadeUp .35s ease both;}
+.winner-card:hover{border-color:var(--yellow);}
+.wc-cycle{font-family:var(--ff-mono);font-size:.72rem;color:var(--muted);width:60px;flex-shrink:0;}
+.wc-info{flex:1;}
+.wc-name{font-weight:700;font-size:.95rem;}
+.wc-date{font-size:.72rem;color:var(--muted);}
+.wc-pts{font-family:var(--ff-mono);font-size:1.1rem;font-weight:700;color:var(--gold);}
+
+/* ─── ADMIN ─── */
+.admin-wrap{width:100%;max-width:920px;}
+.admin-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:24px;flex-wrap:wrap;}
+.atab{flex:1;padding:9px 14px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:var(--ff-body);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;text-align:center;}
+.atab.active{background:var(--card);color:var(--text);border:1px solid var(--border2);}
+.atab:hover:not(.active){color:var(--text);}
+.atab-content{display:none;}
+.atab-content.active{display:block;}
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:22px;}
+.astat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.as-val{font-family:var(--ff-mono);font-size:1.9rem;font-weight:700;color:var(--accent);}
+.as-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.admin-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:20px;}
+.ac-hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;}
+.ac-hdr h3{font-weight:700;font-size:.9rem;}
+.ac-body{padding:20px;}
+table{width:100%;border-collapse:collapse;}
+th{padding:9px 16px;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--surface);text-align:left;border-bottom:1px solid var(--border);}
+td{padding:10px 16px;font-size:.85rem;border-bottom:1px solid rgba(33,38,45,.5);}
+tr:last-child td{border:none;}
+tr:hover td{background:rgba(88,166,255,.025);}
+.tag-sm{font-size:.68rem;padding:2px 8px;border-radius:50px;font-weight:700;background:rgba(88,166,255,.12);color:var(--accent);}
+
+/* ─── QUESTION EDITOR ─── */
+.qe-session-tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.qe-stab{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:var(--ff-body);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.qe-stab.active{border-color:var(--accent);color:var(--accent);background:rgba(88,166,255,.08);}
+.q-editor{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.q-editor h4{font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:12px;font-family:var(--ff-mono);}
+.opt-editor-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.opt-letter-badge{width:24px;height:24px;border-radius:6px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--ff-mono);font-size:.68rem;font-weight:700;color:var(--muted);flex-shrink:0;}
+.radio-correct{accent-color:var(--green);width:16px;height:16px;cursor:pointer;flex-shrink:0;}
+
+/* date config */
+.date-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:560px){.date-config-grid{grid-template-columns:1fr;}}
+.dc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.dc-card h4{font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--accent);color:var(--text);padding:10px 16px;border-radius:9px;font-size:.85rem;font-weight:700;z-index:9999;transform:translateY(70px);opacity:0;transition:all .28s;max-width:280px;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes popIn{from{opacity:0;transform:scale(.87);}to{opacity:1;transform:scale(1);}}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:500px){
+  header{padding:10px 12px;}
+  .hero h1{font-size:2.8rem;}
+  .q-card,.result-card,.form-card{padding:20px;}
+  .locked-card{padding:32px 20px;}
+  .p-blk{width:70px;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">QUIZ<em>SEC</em><sup>PRO</sup></div>
+  <div class="hdr-center">
+    <div class="live-chip">EN VIVO</div>
+    <div id="hdr-clock"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-ghost" onclick="showScreen('ranking')">🏆 Ranking</button>
+    <button class="btn btn-ghost" onclick="showScreen('hall')">🎖 Campeones</button>
+    <button class="btn btn-ghost" onclick="showScreen('admin-login')">🔐</button>
+    <button class="btn btn-accent" onclick="showScreen('welcome')" style="padding:7px 13px;font-size:.78rem;">Inicio</button>
+  </div>
+</header>
+
+<!-- ════════ WELCOME ════════ -->
+<div id="screen-welcome" class="screen active" style="padding-top:42px;">
+  <div class="hero">
+    <div class="eyebrow">⚡ Multijugador · Lunes & Miércoles</div>
+    <h1>EL QUIZ<br><em>ACADÉMICO</em></h1>
+    <p>Respondé 2 preguntas cada Lunes y Miércoles.<br>Cada 2 semanas el ganador se lleva el premio 🏆</p>
+  </div>
+  <div id="w-cycle-badge"></div>
+  <div class="schedule-grid" id="w-schedule"></div>
+  <div id="w-content"></div>
+</div>
+
+<!-- ════════ QUIZ ════════ -->
+<div id="screen-quiz" class="screen" style="padding-top:28px;">
+  <div class="quiz-wrap">
+    <div class="qtop">
+      <div class="player-chip">
+        <div class="av" id="q-av" style="width:28px;height:28px;font-size:.74rem;"></div>
+        <span id="q-pname"></span>
+      </div>
+      <div class="sess-chip" id="q-stag"></div>
+      <div class="score-chip">⚡ <span id="q-sc">0</span> pts</div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="q-prog" style="width:0%"></div></div>
+    <div class="qcount" id="q-cnt"></div>
+    <div class="q-card" id="q-card">
+      <div class="q-badge" id="q-bdg"></div>
+      <div class="q-text" id="q-txt"></div>
+      <div class="opts" id="q-opts"></div>
+      <div class="fb" id="q-fb"></div>
+    </div>
+    <div class="q-footer">
+      <button class="btn btn-accent" id="q-next" style="display:none;" onclick="nextQ()">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ RESULT ════════ -->
+<div id="screen-result" class="screen" style="padding-top:44px;">
+  <div class="result-card">
+    <span class="r-icon" id="r-icon"></span>
+    <h2 id="r-title"></h2>
+    <p id="r-msg"></p>
+    <div class="r-big" id="r-score"></div>
+    <div class="r-sub">puntos esta sesión</div>
+    <div class="cum-box" style="margin-top:14px;">
+      <div class="cum-val" id="r-total"></div>
+      <div class="cum-lbl">puntos acumulados este ciclo</div>
+    </div>
+    <div class="r-actions">
+      <button class="btn btn-ghost" onclick="showScreen('ranking')">🏆 Ranking</button>
+      <button class="btn btn-accent" onclick="showScreen('welcome')">Volver</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ RANKING ════════ -->
+<div id="screen-ranking" class="screen" style="padding-top:28px;">
+  <div class="rank-wrap">
+    <div class="sec-title">RANKING DEL CICLO</div>
+    <div class="sec-sub" id="rank-cycle-label"></div>
+    <div class="refresh-row">
+      <button class="btn btn-ghost btn-sm" onclick="buildRanking()">↻ Actualizar</button>
+      <span class="refresh-info" id="rank-refresh-time"></span>
+    </div>
+    <div class="sum-grid" id="rank-sum"></div>
+    <div class="podium" id="rank-podium"></div>
+    <div class="rank-list" id="rank-list"></div>
+  </div>
+</div>
+
+<!-- ════════ HALL OF FAME ════════ -->
+<div id="screen-hall" class="screen" style="padding-top:28px;">
+  <div class="hall-wrap">
+    <div class="sec-title">🎖 SALÓN DE CAMPEONES</div>
+    <div class="sec-sub" style="margin-bottom:22px;">Ganadores de cada ciclo de 2 semanas</div>
+    <div id="hall-list"></div>
+  </div>
+</div>
+
+<!-- ════════ ADMIN LOGIN ════════ -->
+<div id="screen-admin-login" class="screen" style="padding-top:80px;">
+  <div class="form-card">
+    <div style="font-family:var(--ff-display);font-size:1.9rem;letter-spacing:1px;margin-bottom:6px;">ADMIN</div>
+    <p style="color:var(--muted);font-size:.85rem;margin-bottom:20px;">Panel de control total del quiz.</p>
+    <label class="fl">Contraseña</label>
+    <input class="fi" id="a-pass" type="password" placeholder="••••••••">
+    <button class="btn btn-accent btn-full btn-lg" onclick="adminLogin()">Acceder →</button>
+    <p id="a-err" style="color:var(--accent2);font-size:.82rem;margin-top:10px;display:none;">Contraseña incorrecta.</p>
+  </div>
+</div>
+
+<!-- ════════ ADMIN PANEL ════════ -->
+<div id="screen-admin" class="screen" style="padding-top:28px;align-items:flex-start;">
+  <div class="admin-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div class="sec-title">PANEL ADMIN</div>
+        <div class="sec-sub">Control total del quiz</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="buildAdminPanel()">↻ Refrescar</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="showScreen('welcome')">← Salir</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="admin-tabs">
+      <button class="atab active" onclick="switchAdminTab('overview',this)">📊 Resumen</button>
+      <button class="atab" onclick="switchAdminTab('questions',this)">✏️ Preguntas</button>
+      <button class="atab" onclick="switchAdminTab('dates',this)">📅 Fechas</button>
+      <button class="atab" onclick="switchAdminTab('results',this)">📋 Resultados</button>
+      <button class="atab" onclick="switchAdminTab('cycle',this)">🔄 Ciclo</button>
+      <button class="atab" onclick="switchAdminTab('password',this)">🔐 Contraseña</button>
+    </div>
+
+    <!-- TAB: OVERVIEW -->
+    <div class="atab-content active" id="atab-overview">
+      <div class="admin-grid" id="a-stats"></div>
+      <div class="admin-card" id="a-session-prog"></div>
+      <div class="admin-card">
+        <div class="ac-hdr"><h3>Ranking actual del ciclo</h3></div>
+        <div style="overflow-x:auto;">
+          <table><thead><tr><th>#</th><th>Nombre</th><th>Sesiones</th><th>Correctas</th><th>Pts totales</th></tr></thead>
+          <tbody id="a-rank-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: QUESTIONS -->
+    <div class="atab-content" id="atab-questions">
+      <div class="admin-card">
+        <div class="ac-hdr">
+          <h3>Editor de preguntas</h3>
+          <button class="btn btn-green btn-sm" onclick="saveQuestions()">💾 Guardar preguntas</button>
+        </div>
+        <div class="ac-body">
+          <p style="color:var(--muted);font-size:.83rem;margin-bottom:16px;">Las preguntas se guardan en el navegador y se aplican inmediatamente. Seleccioná la sesión que querés editar.</p>
+          <div class="qe-session-tabs" id="qe-tabs"></div>
+          <div id="qe-editor"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: DATES -->
+    <div class="atab-content" id="atab-dates">
+      <div class="admin-card">
+        <div class="ac-hdr">
+          <h3>Configuración de fechas</h3>
+          <button class="btn btn-green btn-sm" onclick="saveDates()">💾 Guardar fechas</button>
+        </div>
+        <div class="ac-body">
+          <div class="notice notice-yellow" style="margin-bottom:18px;">⚠ Cambiar las fechas afecta inmediatamente cuándo se habilitan las sesiones para los jugadores.</div>
+          <div id="dates-editor"></div>
+          <div style="margin-top:20px;">
+            <label class="fl">Zona horaria de referencia</label>
+            <p style="color:var(--muted);font-size:.82rem;">El juego usa la hora del dispositivo del jugador. Asegurate que los jugadores tengan la zona horaria correcta (Argentina: GMT-3).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: RESULTS -->
+    <div class="atab-content" id="atab-results">
+      <div class="admin-card">
+        <div class="ac-hdr">
+          <h3>Todos los resultados del ciclo</h3>
+          <button class="btn btn-danger btn-sm" onclick="deleteResult()">🗑 Borrar seleccionado</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table><thead><tr><th><input type="checkbox" id="chk-all" onchange="toggleAll(this)"></th><th>Nombre</th><th>Sesión</th><th>Correctas</th><th>Pts sesión</th><th>Pts ciclo</th><th>Fecha</th></tr></thead>
+          <tbody id="a-results-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CYCLE -->
+    <div class="atab-content" id="atab-cycle">
+      <div class="admin-card">
+        <div class="ac-hdr"><h3>Gestión del ciclo</h3></div>
+        <div class="ac-body">
+          <div style="margin-bottom:20px;">
+            <div class="notice notice-blue" style="margin-bottom:14px;">ℹ Al cerrar el ciclo, el jugador con más puntos se registra como campeón en el Salón de Campeones, y los puntajes del ciclo se resetean para el nuevo ciclo.</div>
+            <div id="current-winner-preview" style="margin-bottom:16px;"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-yellow btn-lg" onclick="closeCycleAndArchive()">🏁 Cerrar ciclo y premiar ganador</button>
+              <button class="btn btn-danger btn-sm" onclick="resetCycleOnly()">🗑 Resetear sin premiar</button>
+            </div>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+          <h4 style="font-weight:700;margin-bottom:12px;font-size:.9rem;">Salón de campeones (historial)</h4>
+          <div id="admin-hall-list"></div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-danger btn-sm" onclick="clearHall()">🗑 Borrar historial de campeones</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PASSWORD -->
+    <div class="atab-content" id="atab-password">
+      <div class="admin-card">
+        <div class="ac-hdr"><h3>Cambiar contraseña de admin</h3></div>
+        <div class="ac-body" style="max-width:380px;">
+          <label class="fl">Contraseña actual</label>
+          <input class="fi" id="pw-current" type="password" placeholder="••••••••">
+          <label class="fl">Nueva contraseña</label>
+          <input class="fi" id="pw-new" type="password" placeholder="••••••••">
+          <label class="fl">Confirmar nueva contraseña</label>
+          <input class="fi" id="pw-confirm" type="password" placeholder="••••••••">
+          <button class="btn btn-green btn-full" onclick="changePassword()">💾 Guardar contraseña</button>
+          <div id="pw-msg" style="margin-top:10px;font-size:.83rem;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .page -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// STORAGE KEYS
+// ══════════════════════════════════════════════
+const SK = {
+  results:   'qsp_results',
+  questions: 'qsp_questions',
+  sessions:  'qsp_sessions',
+  cycleNum:  'qsp_cycle_num',
+  cycleStart:'qsp_cycle_start',
+  hall:      'qsp_hall',
+  password:  'qsp_password',
+};
+
+function gs(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch{ return null; } }
+function ss(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+
+// ══════════════════════════════════════════════
+// DEFAULTS
+// ══════════════════════════════════════════════
+const DEFAULT_PASSWORD = 'admin123';
+
+const DEFAULT_SESSIONS = [
+  { id:1, label:'Sesión 1', day:'Lunes',     week:1, date:'2025-05-05' },
+  { id:2, label:'Sesión 2', day:'Miércoles', week:1, date:'2025-05-07' },
+  { id:3, label:'Sesión 3', day:'Lunes',     week:2, date:'2025-05-12' },
+  { id:4, label:'Sesión 4', day:'Miércoles', week:2, date:'2025-05-14' },
+];
+
+const DEFAULT_QUESTIONS = {
+  1: [
+    { q:'¿Cuál es la unidad básica de la vida?', opts:['El átomo','La célula','El tejido','El órgano'], correct:1 },
+    { q:'¿Qué gas es fundamental para la fotosíntesis?', opts:['Oxígeno','Nitrógeno','Dióxido de carbono','Helio'], correct:2 }
+  ],
+  2: [
+    { q:'¿En qué año llegó Colón a América?', opts:['1488','1490','1492','1496'], correct:2 },
+    { q:'¿Cuál fue el primer país independiente de América Latina?', opts:['Argentina','México','Haití','Brasil'], correct:2 }
+  ],
+  3: [
+    { q:'¿Cuánto es la raíz cuadrada de 144?', opts:['10','11','12','13'], correct:2 },
+    { q:'¿Cuántos grados tiene un triángulo?', opts:['90°','180°','270°','360°'], correct:1 }
+  ],
+  4: [
+    { q:'¿Cuál es el océano más grande?', opts:['Atlántico','Índico','Ártico','Pacífico'], correct:3 },
+    { q:'¿En qué continente está Egipto?', opts:['Asia','Europa','África','Oceanía'], correct:2 }
+  ]
+};
+
+// ══════════════════════════════════════════════
+// GETTERS (with defaults)
+// ══════════════════════════════════════════════
+function getPassword(){ return gs(SK.password) || DEFAULT_PASSWORD; }
+function getSessions(){ return gs(SK.sessions) || DEFAULT_SESSIONS; }
+function getQuestions(){ return gs(SK.questions) || DEFAULT_QUESTIONS; }
+function getResults(){ return gs(SK.results) || []; }
+function getCycleNum(){ return gs(SK.cycleNum) || 1; }
+function getHall(){ return gs(SK.hall) || []; }
+function getPTS(){ return 150; }
+
+// ══════════════════════════════════════════════
+// DATE LOGIC
+// ══════════════════════════════════════════════
+function parseDate(str){
+  const [y,m,d] = str.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+function todayDate(){
+  const t = new Date(); t.setHours(0,0,0,0); return t;
+}
+function sessionStatus(s){
+  const today = todayDate();
+  const sd = parseDate(s.date);
+  const nd = new Date(sd); nd.setDate(nd.getDate()+1);
+  if(today < sd) return 'upcoming';
+  if(today >= sd && today < nd) return 'open';
+  return 'done';
+}
+function getActiveSession(){
+  return getSessions().find(s => sessionStatus(s) === 'open') || null;
+}
+function getNextSession(){
+  return getSessions().find(s => sessionStatus(s) === 'upcoming') || null;
+}
+function hasPlayed(name, sessionId){
+  return getResults().some(r => r.name === name && r.sessionId === sessionId);
+}
+function playerCycleTotal(name){
+  return getResults().filter(r=>r.name===name).reduce((a,r)=>a+r.score,0);
+}
+function fmtDate(d){
+  return d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+}
+function fmtDateShort(d){
+  return d.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+}
+
+// ══════════════════════════════════════════════
+// CURRENT STATE
+// ══════════════════════════════════════════════
+let state = {
+  playerName:'', currentSession:null,
+  currentQ:0, sessionScore:0, correctCount:0, answered:false
+};
+
+// ══════════════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════════════
+function startClock(){
+  const el = document.getElementById('hdr-clock');
+  function tick(){
+    const n = new Date();
+    el.textContent =
+      n.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) +
+      ' · ' + n.toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'});
+  }
+  tick(); setInterval(tick, 1000);
+}
+
+// ══════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById('screen-'+name);
+  if(el) el.classList.add('active');
+  if(name==='welcome') buildWelcome();
+  if(name==='ranking') buildRanking();
+  if(name==='hall') buildHall();
+  if(name==='admin'){
+    buildAdminPanel();
+    buildQEditor(1);
+    buildDatesEditor();
+    buildCycleTab();
+  }
+}
+
+// ══════════════════════════════════════════════
+// WELCOME
+// ══════════════════════════════════════════════
+function buildWelcome(){
+  const sessions = getSessions();
+  const active = getActiveSession();
+  const next = getNextSession();
+  const allDone = sessions.every(s=>sessionStatus(s)==='done');
+  const cycleNum = getCycleNum();
+
+  // Cycle badge
+  document.getElementById('w-cycle-badge').innerHTML =
+    `<div class="cycle-badge">📅 <span class="cb-num">Ciclo #${cycleNum}</span> — ${sessions.length} sesiones</div>`;
+
+  // Schedule strip
+  const strip = document.getElementById('w-schedule');
+  strip.innerHTML = '';
+  sessions.forEach(s=>{
+    const st = sessionStatus(s);
+    const d = parseDate(s.date);
+    let pillTxt, pillCls;
+    if(st==='open'){pillTxt='ABIERTO';pillCls='pill-open';}
+    else if(st==='done'){pillTxt='Cerrado';pillCls='pill-done';}
+    else{pillTxt='Próximo';pillCls='pill-next';}
+    const chip = document.createElement('div');
+    chip.className = 's-chip'+(st==='open'?' open':'')+(st==='done'?' done':'');
+    chip.innerHTML = `<div class="sc-num">Ses. ${s.id}</div>
+      <div class="sc-day">${s.day}</div>
+      <div class="sc-date">${fmtDateShort(d)}</div>
+      <div class="sc-pill ${pillCls}">${pillTxt}</div>`;
+    strip.appendChild(chip);
+  });
+
+  const wrap = document.getElementById('w-content');
+
+  if(allDone){
+    wrap.innerHTML=`<div class="locked-card">
+      <span class="li">🏁</span>
+      <h2>Ciclo finalizado</h2>
+      <p>Todas las sesiones han cerrado. El admin puede premiar al ganador y comenzar el nuevo ciclo.</p>
+      <button class="btn btn-accent btn-lg" onclick="showScreen('ranking')">Ver ranking final 🏆</button>
+    </div>`;
+    return;
+  }
+
+  if(!active){
+    const nd = next ? parseDate(next.date) : null;
+    const qs = getQuestions();
+    const subj = next ? (qs[next.id] ? `— ${next.label}` : '') : '';
+    wrap.innerHTML=`<div class="locked-card">
+      <span class="li">🔒</span>
+      <h2>Hoy no hay sesión</h2>
+      <p>Las encuestas se abren automáticamente cada <strong>Lunes</strong> y <strong>Miércoles</strong>.</p>
+      ${nd?`<div class="cd-box"><div class="cd-lbl">Próxima sesión en</div><div class="cd-val" id="cd-v">--</div></div>`:''}
+      ${nd?`<div class="next-box">Próxima: <strong>${fmtDate(nd)}</strong> ${subj}</div>`:''}
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-lg" onclick="showScreen('ranking')">🏆 Ver ranking</button>
+        <button class="btn btn-ghost btn-lg" onclick="showScreen('hall')">🎖 Campeones</button>
+      </div>
+    </div>`;
+    if(nd) startCountdown(nd);
+    return;
+  }
+
+  // Session open
+  wrap.innerHTML=`<div class="form-card">
+    <div class="notice notice-green">🟢 <strong>${active.label}</strong> — ${fmtDate(parseDate(active.date))}</div>
+    <div class="time-row" id="live-time"></div>
+    <label class="fl">Tu nombre</label>
+    <input class="fi" id="w-name" type="text" placeholder="Ej: Valentina García" maxlength="30">
+    <div id="w-played-msg"></div>
+    <button class="btn btn-green btn-full btn-lg" onclick="tryStart()">Jugar ahora →</button>
+  </div>`;
+  tickTime(); setInterval(tickTime,1000);
+  document.getElementById('w-name').addEventListener('input',function(){
+    const n=this.value.trim();
+    const msg=document.getElementById('w-played-msg');
+    if(n.length>1 && hasPlayed(n,active.id)){
+      msg.innerHTML=`<div class="notice notice-yellow">⚠ Ya jugaste esta sesión. Tu primer resultado está guardado. Podés practicar pero no se sobreescribe.</div>`;
+    } else { msg.innerHTML=''; }
+  });
+}
+
+function tickTime(){
+  const el=document.getElementById('live-time');
+  if(!el)return;
+  const n=new Date();
+  const p=v=>String(v).padStart(2,'0');
+  el.innerHTML=`<div class="tb"><div class="tv">${p(n.getHours())}</div><div class="tl">Hora</div></div>
+    <div class="ts">:</div>
+    <div class="tb"><div class="tv">${p(n.getMinutes())}</div><div class="tl">Min</div></div>
+    <div class="ts">:</div>
+    <div class="tb"><div class="tv">${p(n.getSeconds())}</div><div class="tl">Seg</div></div>
+    <div style="width:1px;height:28px;background:var(--border);margin:0 6px;"></div>
+    <div class="tb"><div class="tv" style="font-size:.88rem;">${n.toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'})}</div><div class="tl">Fecha</div></div>`;
+}
+
+function startCountdown(target){
+  function t(){
+    const el=document.getElementById('cd-v');
+    if(!el)return;
+    const ms=target-new Date();
+    if(ms<=0){el.textContent='¡Ahora!';return;}
+    const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);
+    el.textContent=`${h}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+  }
+  t(); setInterval(t,1000);
+}
+
+// ══════════════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════════════
+function tryStart(){
+  const name=document.getElementById('w-name').value.trim();
+  if(!name){showToast('⚠ Ingresá tu nombre');return;}
+  const active=getActiveSession();
+  if(!active){showToast('No hay sesión activa');return;}
+  state.playerName=name; state.currentSession=active;
+  state.currentQ=0; state.sessionScore=0; state.correctCount=0; state.answered=false;
+  document.getElementById('q-pname').textContent=name;
+  const av=document.getElementById('q-av');
+  av.textContent=name[0].toUpperCase(); av.style.background=avatarGrad(name);
+  document.getElementById('q-stag').textContent=`${active.label}`;
+  showScreen('quiz'); renderQ();
+}
+
+function renderQ(){
+  const qs=getQuestions();
+  const sessionQs=qs[state.currentSession.id]||[];
+  const q=sessionQs[state.currentQ];
+  const total=sessionQs.length;
+  const pct=(state.currentQ/total)*100;
+  document.getElementById('q-prog').style.width=pct+'%';
+  document.getElementById('q-cnt').textContent=`Pregunta ${state.currentQ+1} / ${total}`;
+  document.getElementById('q-sc').textContent=state.sessionScore;
+  document.getElementById('q-bdg').textContent=`Pregunta ${state.currentQ+1}`;
+  document.getElementById('q-txt').textContent=q.q;
+  document.getElementById('q-fb').className='fb';
+  document.getElementById('q-next').style.display='none';
+  state.answered=false;
+  const letters=['A','B','C','D'];
+  const optsEl=document.getElementById('q-opts');
+  optsEl.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML=`<span class="opt-l">${letters[i]}</span>${opt}`;
+    btn.onclick=()=>checkAnswer(i,q.correct,btn);
+    optsEl.appendChild(btn);
+  });
+  const card=document.getElementById('q-card');
+  card.style.animation='none';
+  requestAnimationFrame(()=>{card.style.animation='fadeUp .38s ease both';});
+}
+
+function checkAnswer(chosen,correct,btn){
+  if(state.answered)return;
+  state.answered=true;
+  document.querySelectorAll('.opt').forEach(o=>o.classList.add('disabled'));
+  const fb=document.getElementById('q-fb');
+  if(chosen===correct){
+    btn.classList.add('correct'); state.sessionScore+=getPTS(); state.correctCount++;
+    document.getElementById('q-sc').textContent=state.sessionScore;
+    fb.className='fb show ok'; fb.textContent=`✓ ¡Correcto! +${getPTS()} puntos`;
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.opt')[correct].classList.add('correct');
+    const qs=getQuestions();
+    const sessionQs=qs[state.currentSession.id]||[];
+    fb.className='fb show fail';
+    fb.textContent=`✗ La respuesta correcta era: ${sessionQs[state.currentQ].opts[correct]}`;
+  }
+  document.getElementById('q-next').style.display='block';
+}
+
+function nextQ(){
+  state.currentQ++;
+  const qs=getQuestions();
+  const sessionQs=qs[state.currentSession.id]||[];
+  if(state.currentQ>=sessionQs.length){ finishSession(); }
+  else { renderQ(); }
+}
+
+function finishSession(){
+  const alreadyPlayed=hasPlayed(state.playerName,state.currentSession.id);
+  if(!alreadyPlayed){
+    const results=getResults();
+    results.push({
+      name:state.playerName, sessionId:state.currentSession.id,
+      sessionLabel:state.currentSession.label, score:state.sessionScore,
+      correct:state.correctCount, total:(getQuestions()[state.currentSession.id]||[]).length,
+      date:new Date().toLocaleDateString('es-AR'), ts:Date.now()
+    });
+    ss(SK.results,results);
+  }
+  const pct=state.correctCount/(getQuestions()[state.currentSession.id]||[]).length;
+  let icon,title,msg;
+  if(pct===1){icon='🏆';title='¡PERFECTO!';msg='Respondiste todo bien. ¡Excelente!';}
+  else if(pct>=.5){icon='🎉';title='¡BIEN!';msg=`Acertaste ${state.correctCount} de ${(getQuestions()[state.currentSession.id]||[]).length}.`;}
+  else{icon='💪';title='¡A ESTUDIAR!';msg=`Acertaste ${state.correctCount}. Podés mejorar.`;}
+  if(alreadyPlayed) msg+=' (No guardado — ya participaste en esta sesión)';
+  document.getElementById('r-icon').textContent=icon;
+  document.getElementById('r-title').textContent=title;
+  document.getElementById('r-msg').textContent=msg;
+  document.getElementById('r-score').textContent=state.sessionScore;
+  document.getElementById('r-total').textContent=playerCycleTotal(state.playerName)+' pts';
+  showScreen('result');
+}
+
+// ══════════════════════════════════════════════
+// RANKING
+// ══════════════════════════════════════════════
+let rankInterval;
+function buildRanking(){
+  const results=getResults();
+  document.getElementById('rank-cycle-label').textContent=`Ciclo #${getCycleNum()} — puntaje acumulado de todas las sesiones`;
+  const players={};
+  results.forEach(r=>{
+    if(!players[r.name]) players[r.name]={name:r.name,total:0,sessions:{},played:0};
+    players[r.name].total+=r.score;
+    players[r.name].sessions[r.sessionId]=r;
+    players[r.name].played++;
+  });
+  const sorted=Object.values(players).sort((a,b)=>b.total-a.total);
+  const sessions=getSessions();
+  const maxPts=sessions.length*2*getPTS();
+
+  document.getElementById('rank-sum').innerHTML=`
+    <div class="sum-card"><div class="sum-val">${sorted.length}</div><div class="sum-lbl">Jugadores</div></div>
+    <div class="sum-card"><div class="sum-val">${results.length}</div><div class="sum-lbl">Sesiones jugadas</div></div>
+    <div class="sum-card"><div class="sum-val">${sorted[0]?.total||0}</div><div class="sum-lbl">Puntaje líder</div></div>
+    <div class="sum-card"><div class="sum-val">${maxPts}</div><div class="sum-lbl">Pts posibles</div></div>`;
+
+  // Podium
+  const podEl=document.getElementById('rank-podium');
+  podEl.innerHTML='';
+  if(!sorted.length){
+    podEl.innerHTML='<div class="empty-state"><div class="ei">🏆</div><p>Sin resultados aún.</p></div>';
+  } else {
+    const order=[1,0,2],cls=['pp2','pp1','pp3'],medals=['🥈','🥇','🥉'],heights=[70,98,50];
+    order.forEach((ri,ci)=>{
+      if(!sorted[ri])return;
+      const p=sorted[ri];
+      const div=document.createElement('div');
+      div.className=`p-place ${cls[ci]}`;
+      div.innerHTML=`<div class="p-av" style="background:${avatarGrad(p.name)};color:#fff;">${p.name[0].toUpperCase()}</div>
+        <div class="p-name">${p.name}</div><div class="p-pts">${p.total} pts</div>
+        <div class="p-blk" style="height:${heights[ci]}px">${medals[ci]}</div>`;
+      podEl.appendChild(div);
+    });
+  }
+
+  // List
+  const listEl=document.getElementById('rank-list');
+  listEl.innerHTML='';
+  if(!sorted.length){
+    listEl.innerHTML='<div class="empty-state"><div class="ei">📊</div><p>Cuando los jugadores completen sesiones, aparecerán aquí.</p></div>';
+    return;
+  }
+  sorted.slice(0,40).forEach((p,i)=>{
+    const totalCorrect=Object.values(p.sessions).reduce((a,s)=>a+s.correct,0);
+    const totalQ=Object.values(p.sessions).reduce((a,s)=>a+s.total,0);
+    const pct=totalQ?totalCorrect/totalQ:0;
+    let badge,bc;
+    if(pct===1){badge='Perfecto';bc='rb-s';}
+    else if(pct>=.75){badge='Excelente';bc='rb-a';}
+    else if(pct>=.5){badge='Bien';bc='rb-b';}
+    else{badge='Aprendiz';bc='rb-c';}
+    const dots=sessions.map(s=>{
+      if(p.sessions[s.id]){
+        const sc=p.sessions[s.id];
+        return `<div class="s-dot ${sc.correct===sc.total?'sd-ok':'sd-partial'}" title="S${s.id}: ${sc.score}pts"></div>`;
+      }
+      return `<div class="s-dot sd-none"></div>`;
+    }).join('');
+    const row=document.createElement('div');
+    row.className='rank-row'+(p.name===state.playerName?' is-me':'');
+    row.style.animationDelay=(i*.035)+'s';
+    row.innerHTML=`<div class="rn">${i+1}</div>
+      <div class="av" style="background:${avatarGrad(p.name)};color:#fff;width:32px;height:32px;font-size:.8rem;flex-shrink:0;">${p.name[0].toUpperCase()}</div>
+      <div class="ri">
+        <div class="ri-name">${p.name}${p.name===state.playerName?' <span style="font-size:.68rem;color:var(--accent);">(vos)</span>':''}</div>
+        <div class="ri-meta">${p.played} ses. · <span class="s-dots">${dots}</span></div>
+      </div>
+      <span class="rbadge ${bc}">${badge}</span>
+      <div class="rpts">${p.total}</div>`;
+    listEl.appendChild(row);
+  });
+  document.getElementById('rank-refresh-time').textContent='Actualizado: '+new Date().toLocaleTimeString('es-AR');
+  if(!rankInterval) rankInterval=setInterval(()=>{if(document.getElementById('screen-ranking').classList.contains('active'))buildRanking();},15000);
+}
+
+// ══════════════════════════════════════════════
+// HALL OF FAME
+// ══════════════════════════════════════════════
+function buildHall(){
+  const hall=getHall();
+  const el=document.getElementById('hall-list');
+  if(!hall.length){
+    el.innerHTML='<div class="empty-state"><div class="ei">🎖</div><p>Aún no hay ciclos completados. ¡El primero estará aquí pronto!</p></div>';
+    return;
+  }
+  el.innerHTML='';
+  [...hall].reverse().forEach((w,i)=>{
+    const div=document.createElement('div');
+    div.className='winner-card';
+    div.style.animationDelay=(i*.04)+'s';
+    div.innerHTML=`<div class="wc-cycle">Ciclo #${w.cycle}</div>
+      <div class="av" style="background:${avatarGrad(w.name)};color:#fff;width:36px;height:36px;font-size:.88rem;">${w.name[0].toUpperCase()}</div>
+      <div class="wc-info"><div class="wc-name">🏆 ${w.name}</div><div class="wc-date">${w.date}</div></div>
+      <div class="wc-pts">${w.total} pts</div>`;
+    el.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════
+// ADMIN LOGIN
+// ══════════════════════════════════════════════
+function adminLogin(){
+  if(document.getElementById('a-pass').value===getPassword()){
+    document.getElementById('a-err').style.display='none';
+    document.getElementById('a-pass').value='';
+    showScreen('admin');
+  } else {
+    document.getElementById('a-err').style.display='block';
+  }
+}
+
+// ══════════════════════════════════════════════
+// ADMIN TABS
+// ══════════════════════════════════════════════
+function switchAdminTab(name,btn){
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.atab-content').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('atab-'+name).classList.add('active');
+  if(name==='questions') buildQEditor(currentQEditorSession||1);
+  if(name==='dates') buildDatesEditor();
+  if(name==='cycle') buildCycleTab();
+}
+
+// ══════════════════════════════════════════════
+// ADMIN OVERVIEW
+// ══════════════════════════════════════════════
+function buildAdminPanel(){
+  const results=getResults();
+  const players=new Set(results.map(r=>r.name)).size;
+  const avg=results.length?Math.round(results.reduce((a,r)=>a+r.score,0)/results.length):0;
+  const perfect=results.filter(r=>r.correct===r.total).length;
+  const sessions=getSessions();
+
+  document.getElementById('a-stats').innerHTML=`
+    <div class="astat"><div class="as-val">${players}</div><div class="as-lbl">Jugadores</div></div>
+    <div class="astat"><div class="as-val">${results.length}</div><div class="as-lbl">Sesiones jugadas</div></div>
+    <div class="astat"><div class="as-val">${avg}</div><div class="as-lbl">Promedio pts</div></div>
+    <div class="astat"><div class="as-val">${perfect}</div><div class="as-lbl">Perfectos</div></div>
+    <div class="astat"><div class="as-val">${getCycleNum()}</div><div class="as-lbl">Ciclo actual</div></div>`;
+
+  // Session progress
+  const counts={};
+  sessions.forEach(s=>counts[s.id]=results.filter(r=>r.sessionId===s.id).length);
+  document.getElementById('a-session-prog').innerHTML=
+    `<div class="ac-hdr"><h3>Sesiones</h3></div>
+    <div style="padding:0 4px;">` +
+    sessions.map(s=>{
+      const st=sessionStatus(s);
+      let pillT,pillC;
+      if(st==='open'){pillT='ABIERTA';pillC='pill-open';}
+      else if(st==='done'){pillT='Cerrada';pillC='pill-done';}
+      else{pillT='Próxima';pillC='pill-next';}
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--ff-mono);font-size:.72rem;color:var(--muted);width:70px;">${s.day} S${s.week}</div>
+        <div style="flex:1;font-size:.88rem;font-weight:600;">${s.label} — ${parseDate(s.date).toLocaleDateString('es-AR',{day:'numeric',month:'short'})}</div>
+        <div style="font-family:var(--ff-mono);font-size:.8rem;color:var(--muted);margin-right:8px;">${counts[s.id]} resp.</div>
+        <span class="sc-pill ${pillC}" style="font-size:.68rem;">${pillT}</span>
+      </div>`;
+    }).join('')+'</div>';
+
+  // Rank table
+  const players2={};
+  results.forEach(r=>{
+    if(!players2[r.name]) players2[r.name]={name:r.name,total:0,played:0,correct:0,totalQ:0};
+    players2[r.name].total+=r.score; players2[r.name].played++;
+    players2[r.name].correct+=r.correct; players2[r.name].totalQ+=r.total;
+  });
+  const sorted=Object.values(players2).sort((a,b)=>b.total-a.total);
+  document.getElementById('a-rank-tbody').innerHTML=sorted.map((p,i)=>
+    `<tr><td>${i+1}</td><td><strong>${p.name}</strong></td><td>${p.played}</td>
+    <td>${p.correct}/${p.totalQ}</td>
+    <td style="font-family:var(--ff-mono);font-weight:700;color:var(--accent);">${p.total}</td></tr>`
+  ).join('')||`<tr><td colspan="5"><div class="empty-state" style="padding:24px;"><div class="ei">📊</div><p>Sin datos.</p></div></td></tr>`;
+
+  // Results table
+  buildResultsTable();
+}
+
+function buildResultsTable(){
+  const results=getResults();
+  const cum={};
+  results.forEach(r=>{ cum[r.name]=(cum[r.name]||0)+r.score; });
+  const sorted=[...results].sort((a,b)=>b.ts-a.ts);
+  document.getElementById('a-results-tbody').innerHTML=sorted.map((r,i)=>
+    `<tr><td><input type="checkbox" class="row-chk" data-idx="${i}"></td>
+    <td><strong>${r.name}</strong></td>
+    <td><span class="tag-sm">${r.sessionLabel}</span></td>
+    <td>${r.correct}/${r.total}</td>
+    <td style="font-family:var(--ff-mono);font-weight:700;color:var(--accent);">${r.score}</td>
+    <td style="font-family:var(--ff-mono);font-weight:700;color:var(--purple);">${cum[r.name]}</td>
+    <td style="color:var(--muted);">${r.date}</td></tr>`
+  ).join('')||`<tr><td colspan="7"><div class="empty-state" style="padding:24px;"><p>Sin resultados.</p></div></td></tr>`;
+}
+
+function toggleAll(chk){
+  document.querySelectorAll('.row-chk').forEach(c=>c.checked=chk.checked);
+}
+
+function deleteResult(){
+  const results=getResults();
+  const sorted=[...results].sort((a,b)=>b.ts-a.ts);
+  const checked=[...document.querySelectorAll('.row-chk:checked')].map(c=>parseInt(c.dataset.idx));
+  if(!checked.length){showToast('⚠ Seleccioná al menos un resultado');return;}
+  const toDelete=new Set(checked.map(i=>sorted[i].ts));
+  const newResults=results.filter(r=>!toDelete.has(r.ts));
+  ss(SK.results,newResults);
+  buildAdminPanel();
+  showToast(`✓ ${checked.length} resultado(s) eliminado(s)`);
+}
+
+// ══════════════════════════════════════════════
+// QUESTION EDITOR
+// ══════════════════════════════════════════════
+let currentQEditorSession=1;
+function buildQEditor(sessionId){
+  currentQEditorSession=sessionId;
+  const sessions=getSessions();
+  const questions=getQuestions();
+
+  // Session tabs
+  const tabsEl=document.getElementById('qe-tabs');
+  tabsEl.innerHTML='';
+  sessions.forEach(s=>{
+    const t=document.createElement('button');
+    t.className='qe-stab'+(s.id===sessionId?' active':'');
+    t.textContent=s.label;
+    t.onclick=()=>buildQEditor(s.id);
+    tabsEl.appendChild(t);
+  });
+
+  const qs=questions[sessionId]||[{q:'',opts:['','','',''],correct:0},{q:'',opts:['','','',''],correct:0}];
+  const editor=document.getElementById('qe-editor');
+  const letters=['A','B','C','D'];
+  editor.innerHTML=qs.map((q,qi)=>`
+    <div class="q-editor">
+      <h4>PREGUNTA ${qi+1}</h4>
+      <label class="fl">Texto de la pregunta</label>
+      <input class="fi fi-sm" id="qe-q-${qi}" value="${escHtml(q.q)}" placeholder="Escribí la pregunta aquí..." style="margin-bottom:12px;">
+      <label class="fl">Opciones (marcá la correcta)</label>
+      ${q.opts.map((opt,oi)=>`
+        <div class="opt-editor-row">
+          <div class="opt-letter-badge">${letters[oi]}</div>
+          <input class="fi fi-sm" id="qe-o-${qi}-${oi}" value="${escHtml(opt)}" placeholder="Opción ${letters[oi]}" style="margin-bottom:0;flex:1;">
+          <input type="radio" class="radio-correct" name="qe-correct-${qi}" id="qe-r-${qi}-${oi}" value="${oi}" ${q.correct===oi?'checked':''}>
+          <label for="qe-r-${qi}-${oi}" style="font-size:.75rem;color:var(--green);font-weight:700;cursor:pointer;">✓</label>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function saveQuestions(){
+  const sessions=getSessions();
+  const questions=getQuestions();
+  const qs=questions[currentQEditorSession]||[];
+  const saved=qs.map((_,qi)=>{
+    const q=document.getElementById(`qe-q-${qi}`)?.value.trim()||'';
+    const opts=[0,1,2,3].map(oi=>document.getElementById(`qe-o-${qi}-${oi}`)?.value.trim()||'');
+    const correctEl=document.querySelector(`input[name="qe-correct-${qi}"]:checked`);
+    const correct=correctEl?parseInt(correctEl.value):0;
+    return {q,opts,correct};
+  });
+  questions[currentQEditorSession]=saved;
+  ss(SK.questions,questions);
+  showToast(`✓ Preguntas de Sesión ${currentQEditorSession} guardadas`);
+}
+
+// ══════════════════════════════════════════════
+// DATES EDITOR
+// ══════════════════════════════════════════════
+function buildDatesEditor(){
+  const sessions=getSessions();
+  const el=document.getElementById('dates-editor');
+  el.innerHTML=`<div class="date-config-grid">${sessions.map(s=>`
+    <div class="dc-card">
+      <h4>${s.label} — ${s.day}</h4>
+      <label class="fl">Fecha (YYYY-MM-DD)</label>
+      <input class="fi fi-sm" id="de-${s.id}" type="date" value="${s.date}">
+      <div style="font-size:.72rem;color:var(--muted);">${fmtDate(parseDate(s.date))}</div>
+    </div>`).join('')}</div>`;
+}
+
+function saveDates(){
+  const sessions=getSessions();
+  sessions.forEach(s=>{
+    const val=document.getElementById(`de-${s.id}`)?.value;
+    if(val) s.date=val;
+  });
+  ss(SK.sessions,sessions);
+  buildDatesEditor();
+  buildWelcome();
+  showToast('✓ Fechas guardadas');
+}
+
+// ══════════════════════════════════════════════
+// CYCLE MANAGEMENT
+// ══════════════════════════════════════════════
+function buildCycleTab(){
+  // Preview current winner
+  const results=getResults();
+  const players={};
+  results.forEach(r=>{ players[r.name]=(players[r.name]||0)+r.score; });
+  const sorted=Object.entries(players).sort((a,b)=>b[1]-a[1]);
+  const preview=document.getElementById('current-winner-preview');
+  if(sorted.length){
+    const [name,pts]=sorted[0];
+    preview.innerHTML=`<div class="notice notice-green">🏆 Líder actual: <strong>${name}</strong> con <strong>${pts} puntos</strong> — será proclamado campeón al cerrar el ciclo.</div>`;
+  } else {
+    preview.innerHTML=`<div class="notice notice-blue">Aún no hay resultados en este ciclo.</div>`;
+  }
+
+  // Hall in admin
+  const hall=getHall();
+  const el=document.getElementById('admin-hall-list');
+  if(!hall.length){ el.innerHTML='<p style="color:var(--muted);font-size:.85rem;">Sin campeones archivados.</p>'; return; }
+  el.innerHTML=hall.map(w=>`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+    <span style="font-family:var(--ff-mono);font-size:.75rem;color:var(--muted);">Ciclo #${w.cycle}</span>
+    <div class="av" style="background:${avatarGrad(w.name)};color:#fff;width:28px;height:28px;font-size:.72rem;">${w.name[0].toUpperCase()}</div>
+    <span style="font-weight:700;flex:1;">${w.name}</span>
+    <span style="font-family:var(--ff-mono);color:var(--gold);font-weight:700;">${w.total} pts</span>
+    <span style="font-size:.72rem;color:var(--muted);">${w.date}</span>
+  </div>`).join('');
+}
+
+function closeCycleAndArchive(){
+  const results=getResults();
+  if(!results.length){ showToast('⚠ No hay resultados para archivar'); return; }
+  const players={};
+  results.forEach(r=>{ players[r.name]=(players[r.name]||0)+r.score; });
+  const sorted=Object.entries(players).sort((a,b)=>b[1]-a[1]);
+  const [winnerName,winnerPts]=sorted[0];
+  const cycleNum=getCycleNum();
+
+  if(!confirm(`¿Cerrar Ciclo #${cycleNum}?\n\nGanador: ${winnerName} (${winnerPts} pts)\n\nEsto archivará al ganador y reseteará los puntos para el nuevo ciclo.`)) return;
+
+  // Archive winner
+  const hall=getHall();
+  hall.push({cycle:cycleNum,name:winnerName,total:winnerPts,date:new Date().toLocaleDateString('es-AR')});
+  ss(SK.hall,hall);
+
+  // Reset for new cycle
+  ss(SK.results,[]);
+  ss(SK.cycleNum, cycleNum+1);
+
+  // Advance dates by 14 days
+  const sessions=getSessions();
+  sessions.forEach(s=>{
+    const d=parseDate(s.date);
+    d.setDate(d.getDate()+14);
+    s.date=d.toISOString().split('T')[0];
+  });
+  ss(SK.sessions,sessions);
+
+  buildAdminPanel();
+  buildCycleTab();
+  showToast(`🏆 ${winnerName} archivado como campeón. ¡Ciclo #${cycleNum+1} iniciado!`);
+}
+
+function resetCycleOnly(){
+  if(!confirm('¿Resetear el ciclo sin premiar a nadie? Los datos se perderán.')) return;
+  ss(SK.results,[]);
+  ss(SK.cycleNum,(getCycleNum()||1)+1);
+  buildAdminPanel();
+  buildCycleTab();
+  showToast('✓ Ciclo reseteado sin archivar');
+}
+
+function clearHall(){
+  if(!confirm('¿Borrar todo el historial de campeones?')) return;
+  ss(SK.hall,[]);
+  buildCycleTab();
+  showToast('✓ Historial de campeones borrado');
+}
+
+// ══════════════════════════════════════════════
+// PASSWORD CHANGE
+// ══════════════════════════════════════════════
+function changePassword(){
+  const cur=document.getElementById('pw-current').value;
+  const nw=document.getElementById('pw-new').value;
+  const conf=document.getElementById('pw-confirm').value;
+  const msg=document.getElementById('pw-msg');
+  if(cur!==getPassword()){msg.style.color='var(--accent2)';msg.textContent='La contraseña actual es incorrecta.';return;}
+  if(nw.length<4){msg.style.color='var(--accent2)';msg.textContent='La nueva contraseña debe tener al menos 4 caracteres.';return;}
+  if(nw!==conf){msg.style.color='var(--accent2)';msg.textContent='Las contraseñas no coinciden.';return;}
+  ss(SK.password,nw);
+  ['pw-current','pw-new','pw-confirm'].forEach(id=>document.getElementById(id).value='');
+  msg.style.color='var(--green)'; msg.textContent='✓ Contraseña cambiada correctamente.';
+  setTimeout(()=>msg.textContent='',3000);
+  showToast('✓ Contraseña actualizada');
+}
+
+// ══════════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════════
+function exportCSV(){
+  const results=getResults();
+  if(!results.length){showToast('Sin datos para exportar');return;}
+  const cum={};
+  results.forEach(r=>{ cum[r.name]=(cum[r.name]||0)+r.score; });
+  const header='Ciclo,Nombre,Sesion,Correctas,Total,Pts_Sesion,Pts_Ciclo,Fecha\n';
+  const rows=results.map(r=>`${getCycleNum()},${r.name},${r.sessionLabel},${r.correct},${r.total},${r.score},${cum[r.name]},${r.date}`).join('\n');
+  const blob=new Blob([header+rows],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`quizsec_ciclo${getCycleNum()}.csv`;a.click();
+  showToast('✓ CSV descargado');
+}
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function avatarGrad(name){
+  const g=['linear-gradient(135deg,#58a6ff,#bc8cff)','linear-gradient(135deg,#3fb950,#58a6ff)','linear-gradient(135deg,#f78166,#e3b341)','linear-gradient(135deg,#bc8cff,#f778ba)','linear-gradient(135deg,#e3b341,#3fb950)','linear-gradient(135deg,#f778ba,#f78166)'];
+  return g[name.charCodeAt(0)%g.length];
+}
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  startClock();
+  buildWelcome();
+});
+</script>
+</body>
+</html>
